@@ -169,3 +169,15 @@ appuser@someinternalhost:~$ hostname
 someinternalhost
 
 ```
+
+bastion_IP = 35.228.30.234 someinternalhost_IP = 10.166.0.3
+bastion_dns = bastion.asmalyshev.ru
+
+    Подключение в одну команду из консоли Два способа реализации: 1 Способ прыжком с доступного хоста на изолированный: ssh -J bastion_IP someinternalhost_IP попадаем через наш внешний хост 35.234.112.242 на изолированный хост 10.156.0.3
+
+    2 Способ подключения к изолированному инстансу через тунель: ssh -tA work@bastion_IP ssh work@someinternalhost_IP используем тунелирование -t для доступа к хосту в изолированной подсети через доступный хост с маршрутизированным IP
+
+    Подключение по алиасу Два способа реализации: 1 Способ использование ~/.ssh/config для создания алиасов нужных хостов редактируем ~/.ssh/config: Host someinternalhost HostName someinternalhost_IP User work ProxyJump bastion_IP После этого по команде ssh someinternalhost мы будем сразу прыгать на нужный изолированный хост
+
+    2 Способ (как вариант) использование алиасов пользовательского окружения Для подключения с локальной консоли по алиасу someinternalhost можно настроить пользовательское окружение на локальной машине создав алиас в .bashrc файле пользователя, например: alias someinternalhost='ssh -tA work@35.234.112.242 ssh work@10.156.0.3' теперь набрав в консоли алиас someinternalhost мы получим подключениек к консоли хоста someinternalhost
+
