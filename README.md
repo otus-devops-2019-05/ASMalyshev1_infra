@@ -56,7 +56,7 @@ self.assertEqual(1 + 1, 1)
 Необходимо исправить эту строку приведя её к виду:
 
 ```python
-self.assertEqual(1, 1)
+self.assertEqual(1 + 1, 2)
 ```
 
 ### Знакомство с облачной инфраструктурой. Google Cloud Platform
