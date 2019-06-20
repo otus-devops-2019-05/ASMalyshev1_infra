@@ -183,3 +183,6 @@ ssh -tA work@35.228.30.234 ssh work@10.166.0.3
 $ ssh -i ~/.ssh/appuser -tA appuser@35.228.30.234 ssh appuser@10.166.0.3
 
 Для подключения по алиасу можно добавить запись /etc/hosts на сервере bastion 10.166.0.3 someinternalhost
+
+Получаем сертификаты Let's Encrypt при помощи Certbot
+https://interface31.ru/tech_it/2017/04/poluchaem-sertifikaty-lets-encrypt-pri-pomoshhi-certbot.html
