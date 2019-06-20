@@ -173,6 +173,7 @@ someinternalhost
 bastion_IP = 35.228.30.234 someinternalhost_IP = 10.166.0.3
 bastion_dns = bastion.asmalyshev.ru
 
+```
     Подключение в одну команду из консоли Два способа реализации: 
 	
 	1 Способ прыжком с доступного хоста на изолированный: ssh -J bastion_IP someinternalhost_IP попадаем через наш внешний хост 35.228.30.234 на изолированный хост 10.166.0.3
@@ -183,3 +184,4 @@ ssh -tA work@35.228.30.234 ssh work@10.166.0.3
 $ ssh -i ~/.ssh/appuser -tA appuser@35.228.30.234 ssh appuser@10.166.0.3
 
 Для подключения по алиасу можно добавить запись /etc/hosts на сервере bastion 10.166.0.3 someinternalhost
+```
