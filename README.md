@@ -230,12 +230,19 @@ Clear-Host
 
 ```
 # Создаем VM "reddit-app"
+```
 gcloud compute instances create reddit-app --boot-disk-size=10GB  --image-family ubuntu-1604-lts  --image-project=ubuntu-os-cloud  --machine-type=g1-small  --tags puma-server  --restart-on-failure
+```
 # Добавляем SSH ключ
+```
 gcloud compute instances add-metadata reddit-app --metadata-from-file ssh-keys="C:\Users\asmalyshev\.ssh\appuser.pub"
+```
 # Подключаемся к VM "reddit-app"
+```
 ssh -i ~/.ssh/appuser appuser@35.228.8.62
+```
 #Обновляем APT, устанавливаем Ruby и Bundler:
+```
 sudo apt update
 sudo apt install -y ruby-full ruby-bundler build-essential
 
@@ -244,21 +251,26 @@ ruby 2.3.1p112 (2016-04-26) [x86_64-linux-gnu]
 
 bundler -v
 Bundler version 1.11.2
-
+```
 #Устанавливаем MongoDB
+```
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
 sudo bash -c 'echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.2.list'
-
+```
 #Обновим индекс доступных пакетов и установим нужный пакет
+```
 sudo apt update
 sudo apt install -y mongodb-org
-
+```
 #Устанавливаем MongoDB
+```
 sudo systemctl start mongod
 sudo systemctl enable mongod
-
+```
 #Проверяем работу MongoDB
+```
 sudo systemctl status mongod
+```
 ```
 Created symlink from /etc/systemd/system/multi-user.target.wants/mongod.service to /lib/systemd/system/mongod.service.
 appuser@reddit-app:~$ sudo systemctl status mongod
@@ -274,16 +286,21 @@ Jun 25 19:08:45 reddit-app systemd[1]: Started High-performance, schema-free doc
 ```
 
 #Деплойп риложения
+```
 git clone -b monolith https://github.com/express42/reddit.git
-
+```
 #Переходим в директорию проекта и устанавливаем зависимости приложения
+```
 cd reddit && bundle install
-
+```
 #Запускаем сервер приложения в папке проект
+```
 puma -d
-
+```
 #Проверьте, что сервер запустился и на каком порту он слушает
+```
 ps aux | grep puma
+```
 ```
 appuser   9698  0.7  1.5 515380 26776 ?        Sl   19:12   0:00 puma 3.10.0 (tcp://0.0.0.0:9292) [reddit]
 appuser   9712  0.0  0.0  12944  1012 pts/0    S+   19:13   0:00 grep --color=auto puma
