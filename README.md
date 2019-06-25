@@ -184,4 +184,124 @@ ssh -tA work@35.228.30.234 ssh work@10.166.0.3
 
 $ ssh -i ~/.ssh/appuser -tA appuser@35.228.30.234 ssh appuser@10.166.0.3
 
-Для подключения по алиасу можно добавить запись /etc/hosts на сервере bastion 10.166.0.3 someinternalhost 
+Для подключения по алиасу можно добавить запись /etc/hosts на сервере bastion 10.166.0.3 someinternalhost
+
+## 6 Основные сервисы Google Cloud Platform (GCP).Домашнее задание
+
+1. Создайть новую ветку "cloud-testapp" в D:\GitHub\ASMalyshev1_infra
+
+2. Перенесите файлы .ovpn и setupvpn.sh, созданные в прошлом ДЗ в директорию D:\GitHub\ASMalyshev1_infra\VPN
+
+``` PS
+Clear-Host
+Set-Location $PSScriptRoot
+
+$VpnFolder = 'VPN'
+
+IF(!(Test-Path -Path .\$VpnFolder)){
+New-Item -Path .\ -Name $VpnFolder -ItemType Directory -Force
+}
+
+Get-ChildItem -Path .\|Where-Object {$_.Extension -eq '.ovpn' -or $_.name -eq 'setupvpn.sh'}|Move-Item -Destination .\$VpnFolder -Force
+```
+
+3. Добавьте созданные в ходе работы скрипты в эту ветку ("cloud-testapp") в корень репозитория (.\);
+Добавить информацию о ДЗ в README.md и вписать данные для подключения в следующем формате(важно для автоматической проверки ДЗ),не удаляя предыдущую:
+
+testapp_IP = 35.228.8.62
+testapp_port = 9292
+
+#Проверка ДЗ
+
+Создать Pull Request для ветки мастер, добавить "Labels" GCP и cloud-testapp к нему.
+
+1. Устанавливаем Google Cloud SDK
+```
+https://cloud.google.com/sdk/docs/#install_the_latest_cloud_sdk_version
+```
+gcloud auth list
+
+``` PS
+Clear-Host
+
+[array]$IW = Invoke-WebRequest -Uri https://gist.githubusercontent.com/Nklya/5bc429c6ca9adce1f7898e7228788fe5/raw/01f9e4a1bf00b4c8a37ca6046e3e4d4721a3316a/gcloud -Method Get
+
+(-split $IW.Content) -replace "\\" -join " "
+
+```
+# Создаем VM "reddit-app"
+```
+gcloud compute instances create reddit-app --boot-disk-size=10GB  --image-family ubuntu-1604-lts  --image-project=ubuntu-os-cloud  --machine-type=g1-small  --tags puma-server  --restart-on-failure
+```
+# Добавляем SSH ключ
+```
+gcloud compute instances add-metadata reddit-app --metadata-from-file ssh-keys="C:\Users\asmalyshev\.ssh\appuser.pub"
+```
+# Подключаемся к VM "reddit-app"
+```
+ssh -i ~/.ssh/appuser appuser@35.228.8.62
+```
+#Обновляем APT, устанавливаем Ruby и Bundler:
+```
+sudo apt update
+sudo apt install -y ruby-full ruby-bundler build-essential
+
+ruby -v
+ruby 2.3.1p112 (2016-04-26) [x86_64-linux-gnu]
+
+bundler -v
+Bundler version 1.11.2
+```
+#Устанавливаем MongoDB
+```
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+sudo bash -c 'echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.2.list'
+```
+#Обновим индекс доступных пакетов и установим нужный пакет
+```
+sudo apt update
+sudo apt install -y mongodb-org
+```
+#Устанавливаем MongoDB
+```
+sudo systemctl start mongod
+sudo systemctl enable mongod
+```
+#Проверяем работу MongoDB
+```
+sudo systemctl status mongod
+```
+```
+Created symlink from /etc/systemd/system/multi-user.target.wants/mongod.service to /lib/systemd/system/mongod.service.
+appuser@reddit-app:~$ sudo systemctl status mongod
+● mongod.service - High-performance, schema-free document-oriented database
+   Loaded: loaded (/lib/systemd/system/mongod.service; enabled; vendor preset: e
+   Active: active (running) since Tue 2019-06-25 19:08:45 UTC; 1min 3s ago
+     Docs: https://docs.mongodb.org/manual
+ Main PID: 8977 (mongod)
+   CGroup: /system.slice/mongod.service
+           └─8977 /usr/bin/mongod --quiet --config /etc/mongod.conf
+
+Jun 25 19:08:45 reddit-app systemd[1]: Started High-performance, schema-free doc
+```
+
+#Деплойп риложения
+```
+git clone -b monolith https://github.com/express42/reddit.git
+```
+#Переходим в директорию проекта и устанавливаем зависимости приложения
+```
+cd reddit && bundle install
+```
+#Запускаем сервер приложения в папке проект
+```
+puma -d
+```
+#Проверьте, что сервер запустился и на каком порту он слушает
+```
+ps aux | grep puma
+```
+```
+appuser   9698  0.7  1.5 515380 26776 ?        Sl   19:12   0:00 puma 3.10.0 (tcp://0.0.0.0:9292) [reddit]
+appuser   9712  0.0  0.0  12944  1012 pts/0    S+   19:13   0:00 grep --color=auto puma 
+```
