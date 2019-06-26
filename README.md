@@ -208,7 +208,7 @@ Get-ChildItem -Path .\|Where-Object {$_.Extension -eq '.ovpn' -or $_.name -eq 's
 3. Добавьте созданные в ходе работы скрипты в эту ветку ("cloud-testapp") в корень репозитория (.\);
 Добавить информацию о ДЗ в README.md и вписать данные для подключения в следующем формате(важно для автоматической проверки ДЗ),не удаляя предыдущую:
 
-testapp_IP = 35.228.8.62
+testapp_IP = 35.228.30.234
 testapp_port = 9292
 
 #Проверка ДЗ
@@ -239,7 +239,7 @@ gcloud compute instances add-metadata reddit-app --metadata-from-file ssh-keys="
 ```
 # Подключаемся к VM "reddit-app"
 ```
-ssh -i ~/.ssh/appuser appuser@35.228.8.62
+ssh -i ~/.ssh/appuser appuser@35.228.30.234
 ```
 #Обновляем APT, устанавливаем Ruby и Bundler:
 ```
