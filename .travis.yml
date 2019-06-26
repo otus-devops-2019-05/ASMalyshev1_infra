@@ -5,5 +5,7 @@ before_install:
 - curl https://raw.githubusercontent.com/express42/otus-homeworks/2019-05/run.sh |
   bash
 notifications:
-  slack: asmalyshev:uKnspf4F59WIUKmUlJEEwVWV
+  slack:
+    rooms:
+      secure: CoU5+bXQuGHW/W3YHovrly5/Ix1j176ee+RZTbiylDBKEJLhwJVYNr0/spMDXZmrX4D18jKDHZTUucNWYsh/Wf+ZziS4z0rNcuV72LXh4X+FWwN4X8Z+70C3ZpPnfKvXBNtXk1w6syjPLa02TFalJuv2GSJ0UbXPmT9sqyNtUudnIO9BcbIiVnNIzf2fc73ZcZJsgISJ3dKyvuY7rgNi0s/smDFyHLZrMbrfaYR9IZOr2qsxJ5hK0gXI+LM3TZNbjy5THvdaSpoe8Ke2f/e72Bf3YCcK2GpRDVJYUvM4VuL/UwTDh4WUp9KAdUsvNATZZyID8hH0L9gUfPFg59d4yjoRPvFYUG4+RcCDR3UaAa0ndwkIfncuOsc6+8KU/yhaJ3A4CgbAXQNGccixWgap6D4arX8xFqS1WDgQob6YQnkQFbyDkVHyFRAeJiDikMT0b0YT4Gk5bRdRu6I30WR23SyO3+6Q3ktK8KYG75/0iV5vKiS4JsOhO1UZ953iULXEefOuRzR5PGl81PCjEl8Re04moLcA1t/rio48n96dW0ZTUvI9aMQn6sxiIz066QFo9pM8PSMOYNehhseDsxQRyzfQ+HauM7Tzt8BPNubar+x66rd7ZGKHUqcTsc0gCIxC5SiCqwj/xEsdIHL9StNKb5gpfR1VbII7NPPqB7nb150=
   
