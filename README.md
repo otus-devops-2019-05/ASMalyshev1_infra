@@ -305,3 +305,23 @@ ps aux | grep puma
 appuser   9698  0.7  1.5 515380 26776 ?        Sl   19:12   0:00 puma 3.10.0 (tcp://0.0.0.0:9292) [reddit]
 appuser   9712  0.0  0.0  12944  1012 pts/0    S+   19:13   0:00 grep --color=auto puma 
 ```
+https://travis-ci.com/otus-devops-2019-05/ASMalyshev1_infra/builds/116959880
+
+./otus-homeworks/homeworks/cloud-testapp/run.sh: line 4: ./install_ruby.sh: Permission denied
+./otus-homeworks/homeworks/cloud-testapp/run.sh: line 5: ./install_mongodb.sh: Permission denied
+./otus-homeworks/homeworks/cloud-testapp/run.sh: line 6: ./deploy.sh: Permission denied
+``` PS
+Clear-Host
+Set-Location $PSScriptRoot
+
+"& git ls-files --stage"
+"======================="
+& git ls-files --stage
+
+Get-ChildItem -Filter *.sh|foreach {git update-index --chmod=+x $_.FullName}
+
+'& git ls-files --stage|Select-String -Pattern "^100755"'
+"======================="
+& git ls-files --stage|Select-String -Pattern "^100755"
+"======================="
+```
