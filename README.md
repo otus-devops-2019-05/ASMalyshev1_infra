@@ -305,11 +305,11 @@ appuser   9698  0.7  1.5 515380 26776 ?        Sl   19:12   0:00 puma 3.10.0 (tc
 appuser   9712  0.0  0.0  12944  1012 pts/0    S+   19:13   0:00 grep --color=auto puma 
 ```
 https://travis-ci.com/otus-devops-2019-05/ASMalyshev1_infra/builds/116959880
-
+```
 ./otus-homeworks/homeworks/cloud-testapp/run.sh: line 4: ./install_ruby.sh: Permission denied
 ./otus-homeworks/homeworks/cloud-testapp/run.sh: line 5: ./install_mongodb.sh: Permission denied
 ./otus-homeworks/homeworks/cloud-testapp/run.sh: line 6: ./deploy.sh: Permission denied
-
+```
 https://medium.com/@akash1233/change-file-permissions-when-working-with-git-repos-on-windows-ea22e34d5cee
 
 ``` PS
@@ -327,3 +327,58 @@ Get-ChildItem -Filter *.sh|foreach {git update-index --chmod=+x $_.FullName}
 & git ls-files --stage|Select-String -Pattern "^100755"
 "======================="
 ```
+#7. Сборка образов VM при помощи Packer. Домашнее задание
+```
+packer.exe --version
+```
+
+# 1. СоздайтеАDC:
+```
+gcloud auth application-default login
+```
+ASMalyshev1_infra\packer\ubuntu16.json
+https://raw.githubusercontent.com/express42/otus-snippets/master/packer-base/ubuntu16-03-mongo.json
+```
+{
+    "builders": [
+        {
+            "type": "googlecompute",
+            "project_id": "infra-244306",
+            "image_name": "reddit-base-{{timestamp}}",
+            "image_family": "reddit-base",
+            "source_image_family": "ubuntu-1604-lts",
+            "zone": "europe-west1-b",
+            "ssh_username": "appuser",
+            "machine_type": "f1-micro"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "script": "scripts/install_ruby.sh",
+            "execute_command": "sudo {{.Path}}"
+        },
+        {
+            "type": "shell",
+            "script": "scripts/install_mongodb.sh",
+            "execute_command": "sudo {{.Path}}"
+        }
+    ]
+}
+```
+# 2. Перенести скрипты install_mongodb.sh и install_ruby.sh в папку scripts
+# 3. Проверить, не допустили ли мы ошибок при создании шаблона, используя команду packer validate:
+```
+packer.exe validate ./ubuntu16.json
+packer.exe build ./ubuntu16.json
+```
+# 4. Создаем VM из образа rabbit-app
+# 5. Деплоим приложение
+```
+git clone -b monolith https://github.com/express42/reddit.git
+cd reddit && bundle install
+puma -d
+ps aux | grep puma
+```
+
+
