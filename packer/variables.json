@@ -1,0 +1,7 @@
+{
+    "project_id": "indigo-medium-244306",
+    "project_name": "reddis-app",
+    "source_image_family": "ubuntu-1604-lts",
+    "disk_size": "10"
+}
+
