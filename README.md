@@ -33,15 +33,14 @@ gem install travis
 4. Авторизуемся чезер утилиту travis
 
 ```cmd
-travis login --com
+travis login --com --github-token c097194f7702d3c33ee5df50c74243bdb3cbaa40
 ```
 
 5. Теперь зашифруем токен с помощью утилиты travis. Мы должны находиться в папке с нашим репозиторием и в нем должен присутствовать файл `.travis.yml`
 
 ```shell
 cd ~\GitHub\ASMalyshev1_infra
-travis encrypt "devops-team-otus:<ваш_токен>#aleksey_malyshev" \
---add notifications.slack.rooms --com
+travis encrypt "asmalyshev:uKnspf4F59WIUKmUlJEEwVWV#aleksey_malyshev" --add notifications.slack.rooms --com
 ```
 
 13. travis автоматически добавит в файл `.travis.yml` шифрованый токен для уведомлений в slack. Остается только закоммитить изменения в файле.
