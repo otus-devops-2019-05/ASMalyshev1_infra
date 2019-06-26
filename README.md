@@ -310,6 +310,9 @@ https://travis-ci.com/otus-devops-2019-05/ASMalyshev1_infra/builds/116959880
 ./otus-homeworks/homeworks/cloud-testapp/run.sh: line 4: ./install_ruby.sh: Permission denied
 ./otus-homeworks/homeworks/cloud-testapp/run.sh: line 5: ./install_mongodb.sh: Permission denied
 ./otus-homeworks/homeworks/cloud-testapp/run.sh: line 6: ./deploy.sh: Permission denied
+
+https://medium.com/@akash1233/change-file-permissions-when-working-with-git-repos-on-windows-ea22e34d5cee
+
 ``` PS
 Clear-Host
 Set-Location $PSScriptRoot
