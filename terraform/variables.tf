@@ -32,7 +32,7 @@ variable "disk_image" {
 }
 
 variable "instance_count" {
-  type        = "string"
+  type = "string"
   description = "Count instances"
-  default     = "1"
+  default = "1"
 }

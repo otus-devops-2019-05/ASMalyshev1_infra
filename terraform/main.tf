@@ -1,11 +1,11 @@
 terraform {
   # версия terraform
-  required_version = ">=0.11.11"
+  required_version = "~> 0.11.7"
 }
 
 provider "google" {
   # Версия провайдера
-  version = "~> 2.5"
+  version = "2.0.0"
 
   # id проекта
   project = "${var.project}"
@@ -18,7 +18,7 @@ resource "google_compute_instance" "app" {
   machine_type = "g1-small"
   zone         = "${var.zone}"
   tags         = ["reddit-app"]
-  count        = "${var.instance_count}"
+  count = "${var.instance_count}"
 
   # определение загрузочного диска
   boot_disk {
@@ -36,11 +36,7 @@ resource "google_compute_instance" "app" {
     access_config {}
   }
 
-  #Blocks of type "metadata" are not expected here.
-  #https://github.com/terraform-providers/terraform-provider-google/issues/3858
-  #Error: "metadata {" | Ok: "metadata = {" 
-
-  metadata = {
+  metadata {
     # Путь до публичного ключа
     ssh-keys = "appuser:${file(var.public_key_path)}"
   }
@@ -50,9 +46,9 @@ resource "google_compute_instance" "app" {
     type  = "ssh"
     user  = "appuser"
     agent = false
-    host  = "146.148.14.4"
+
     # путь до приватного ключа
-    private_key = "${file("C:\\Users\\asmalyshev\\.ssh\\appuser")}"
+    private_key = "${file("~/.ssh/appuser")}"
   }
 
   provisioner "file" {
@@ -84,9 +80,17 @@ resource "google_compute_firewall" "firewall_puma" {
   target_tags = ["reddit-app"]
 }
 
+# use this resource to add single ssh key or single key/value metadata. If you manage different keys, or different metadata use resource declare after that
+# resource "google_compute_project_metadata_item" "appuser1" {
+#   key = "ssh-keys"
+#   value = "appuser1:${file(var.public_key_path)}"
+#   project = "${var.project}"
+# }
+
 resource "google_compute_project_metadata" "many_keys" {
   project = "${var.project}"
   metadata = {
     ssh-keys = "appuser2:${file(var.public_key_path)} \nappuser3:${file(var.public_key_path)}"
   }
 }
+
