@@ -1,0 +1,7 @@
+﻿project = "infra-244306"
+public_key_path = "C:\\Users\\asmalyshev\\.ssh\\appuser.pub"
+privat_key_path = "C:\\Users\\asmalyshev\\.ssh\\appuser"
+disk_image = "reddit-base"
+region = "europe-west1"
+zone = "europe-west1-b"
+count = "1"
