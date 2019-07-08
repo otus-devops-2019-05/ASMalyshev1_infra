@@ -1,0 +1,6 @@
+{
+    "project_id": "id_of_you_project",
+    "project_name": "name_of_you_project",
+    "source_image_family": "example_ubuntu-1604-lts",
+    "disk_size": "10"
+}
