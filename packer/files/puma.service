@@ -1,14 +1,14 @@
+#systemd unit for puma
 [Unit]
-Description=Puma HTTP Server
-After=network.target
+Description=Puma Unit
+After=mongod.service
 
 [Service]
-# Foreground process (do not use --daemon in ExecStart or config.rb)
-Type=simple
-
-WorkingDirectory=/home/userapp/reddit
-
-ExecStart=/usr/local/bin/pumactl start &
+Type=forking
+User=appuser
+ExecStart=/usr/local/bin/puma -d --pidfile /tmp/puma.pid --dir /home/appuser/reddit
+PIDFile=/tmp/puma.pid
+ExecStop=/usr/local/bin/pumactl -P /tmp/puma.pid stop
 
 [Install]
 WantedBy=multi-user.target

@@ -1,39 +1,38 @@
 {
-    "variables":
-	{
-	    "project_id": null,
-	    "project_name": null,
-	    "source_image_family": "reddit-base",
-	    "machine_type": "f1-micro",
-	    "disk_type": "pd-standard",
-	    "disk_size": "10",
-	    "network": "default",
-	    "default_user": "root",
-	    "image_description": "Tempalate with mongoDB + Ruby on Ubuntu 16 and monolith app",
-      "tags": "puma-server"
-	},
+    "variables": {
+        "machine_type": "f1-micro",
+        "ssh_username": "appuser",
+        "preemptible": "false",
+        "tags": "",
+        "network": "default",
+        "subnetwork": "default",
+        "disk_type": "",
+        "disk_size": "10",
+        "image_description": ""
+    },
     "builders": [
         {
             "type": "googlecompute",
-            "project_id": "{{ user `project_id` }}",
+            "project_id": "{{user `project_id`}}",
             "image_name": "reddit-full-{{timestamp}}",
             "image_family": "reddit-full",
-            "source_image_family": "{{ user `source_image_family` }}",
+            "image_description": "{{user `image_description`}}",
+            "source_image_family": "{{user `source_image_family`}}",
             "zone": "europe-west1-b",
-            "network": "{{ user `network` }}",
-            "ssh_username": "{{ user `default_user` }}",
-            "machine_type": "{{ user `machine_type` }}",
-            "disk_type": "{{ user `disk_type` }}",
+            "ssh_username": "{{user `ssh_username`}}",
+            "machine_type": "{{user `machine_type`}}",
+            "disk_type": "{{user `disk_type`}}",
             "disk_size": "{{user `disk_size`}}",
-            "image_description": "{{ user `image_description` }}",
-            "tags": "{{user `[tags]`}}"
+            "network": "{{user `network`}}",
+            "subnetwork": "{{user `subnetwork`}}",
+            "preemptible": "{{user `preemptible`}}",
+            "tags": "{{user `tags`}}"
         }
     ],
-        "provisioners": [
+    "provisioners": [
         {
             "type": "shell",
-            "script": "files/install_app.sh",
-            "execute_command": "sudo {{.Path}}"
+            "inline": ["pwd", "git clone -b monolith https://github.com/express42/reddit.git", "cd reddit && bundle install"]
         },
         {
             "type": "file",
@@ -42,7 +41,12 @@
         },
         {
             "type": "shell",
-            "inline": ["sudo cp /tmp/puma.service /etc/systemd/system/puma.service", "sudo systemctl daemon-reload", "sudo systemctl enable puma"]
+            "inline": [
+                "mv /tmp/puma.service /etc/systemd/system/puma.service",
+                "systemctl daemon-reload",
+                "systemctl enable puma.service"
+            ],
+            "execute_command": "sudo {{.Path}}"
         }
     ]
 }
