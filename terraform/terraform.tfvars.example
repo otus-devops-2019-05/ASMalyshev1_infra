@@ -1,12 +1,7 @@
-project = "mindphaser34-infra"
-
+project = "infra-244306"
 public_key_path = "~/.ssh/appuser.pub"
-
-private_key_path = "~/.ssh/appuser"
-
-zone = "europe-west1-b"
-
+privat_key_path = "~/.ssh/appuser"
 disk_image = "reddit-base"
-
-public_key_path_appuser_web = "~/.ssh/appuser.pub"
-
+region = "europe-west1"
+zone = "europe-west1-b"
+count = "1"

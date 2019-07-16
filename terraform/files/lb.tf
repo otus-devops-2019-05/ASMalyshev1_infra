@@ -1,62 +1,57 @@
-# Terraform Version
-terraform {
-  required_version = "0.11.11"
-}
-
-# Group
-resource "google_compute_instance_group" "instance-group-1" {
-  name      = "instance-group-1"
-  zone      = "${var.zone}"
-  instances = ["${google_compute_instance.app.*.self_link}"]
+# load balancer configuration
+# Create instanse group
+resource "google_compute_instance_group" "reddit-app" {
+  name        = "reddit-app"
+  description = "Reddit app instanse group"
+  zone        = "${var.zone}"
+  instances   = ["${google_compute_instance.app.*.self_link}"]
 
   named_port {
     name = "http"
-    port = 9292
+    port = "9292"
   }
+
+  #  lifecycle {
+  #    create_before_destroy = true
+  #  }
 }
 
-# Backend Services
-resource "google_compute_backend_service" "lb-back" {
-  name        = "lb-back"
-  protocol    = "HTTP"
-  timeout_sec = "10"
+# Create backend for lb
+resource "google_compute_backend_service" "reddit-app" {
+  name      = "reddit-backend"
+  port_name = "http"
+  protocol  = "HTTP"
 
   backend {
-    group = "${google_compute_instance_group.instance-group-1.self_link}"
+    group = "${google_compute_instance_group.reddit-app.self_link}"
   }
 
-  health_checks = ["${google_compute_http_health_check.lb-healthchk.self_link}"]
+  health_checks = ["${google_compute_http_health_check.reddit-health.self_link}"]
 }
 
-# Health Check
-resource "google_compute_http_health_check" "lb-healthchk" {
-  name               = "lb-healthchk"
-  request_path       = "/"
-  check_interval_sec = 10
-  timeout_sec        = 5
-  port               = 9292
+# add health check
+resource "google_compute_http_health_check" "reddit-health" {
+  name         = "reddit-health"
+  request_path = "/"
+  port         = "9292"
 }
 
-# LB Proxy
-resource "google_compute_target_http_proxy" "lb-proxy" {
-  name    = "lb-proxy"
-  url_map = "${google_compute_url_map.lb.self_link}"
+# create urlmap. Name of urlmap will be shown in web-interface GCP
+resource "google_compute_url_map" "reddit-lb" {
+  name            = "reddit-lb"
+  description     = "a URL map for reddit application"
+  default_service = "${google_compute_backend_service.reddit-app.self_link}"
 }
 
-# Mapping proxy with backend
-resource "google_compute_url_map" "lb" {
-  name            = "lb"
-  default_service = "${google_compute_backend_service.lb-back.self_link}"
+#create target proxy to urlmap
+resource "google_compute_target_http_proxy" "reddit-app" {
+  name    = "reddit-app-target-proxy"
+  url_map = "${google_compute_url_map.reddit-lb.self_link}"
 }
 
-# Intarface VM
-resource "google_compute_global_address" "lb-ip" {
-  name = "lb-ip"
-}
-
-resource "google_compute_global_forwarding_rule" "lb-fwd" {
-  name       = "lb-fwd"
+#Create forward rule to forward http to proxy
+resource "google_compute_global_forwarding_rule" "reddit-forward" {
+  name       = "reddit-forward"
+  target     = "${google_compute_target_http_proxy.reddit-app.self_link}"
   port_range = "80"
-  ip_address = "${google_compute_global_address.lb-ip.address}"
-  target     = "${google_compute_target_http_proxy.lb-proxy.self_link}"
 }
