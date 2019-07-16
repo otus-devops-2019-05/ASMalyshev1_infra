@@ -18,7 +18,7 @@ resource "google_compute_instance" "app" {
   machine_type = "g1-small"
   zone         = "${var.zone}"
   tags         = ["reddit-app"]
-  count        = "${var.instance_count}"
+  count = "${var.instance_count}"
 
   # определение загрузочного диска
   boot_disk {
@@ -80,6 +80,19 @@ resource "google_compute_firewall" "firewall_puma" {
   target_tags = ["reddit-app"]
 }
 
+resource "google_compute_firewall" "firewall_ssh" {
+  name        = "default-allow-ssh"
+  description = "Allow SSH from anywhere"
+  network     = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+}
+
 # use this resource to add single ssh key or single key/value metadata. If you manage different keys, or different metadata use resource declare after that
 # resource "google_compute_project_metadata_item" "appuser1" {
 #   key = "ssh-keys"
@@ -89,8 +102,8 @@ resource "google_compute_firewall" "firewall_puma" {
 
 resource "google_compute_project_metadata" "many_keys" {
   project = "${var.project}"
-
   metadata = {
     ssh-keys = "appuser2:${file(var.public_key_path)} \nappuser3:${file(var.public_key_path)}"
   }
 }
+

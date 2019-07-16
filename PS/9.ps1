@@ -9,7 +9,8 @@ $GitRootFolder = 'D:\GitHub\ASMalyshev1_infra'
 
 # Устанавливаем terraform если он не установлен
 IF (!(Test-Path "$env:windir\System32\terraform.exe")){
-.\DownloadTerraform.ps1 -Version "0.11.7"
+#.\DownloadTerraform.ps1 -Version "0.11.11"
+.\DownloadTerraform.ps1
 }
 
 # Создаем новую ветку в нашем инфраструктурномрепозитории для выполнения данного ДЗ. Т.к. второе задание, посвященое работе с Terraform, то ветку назовем "terraform-2"
@@ -24,8 +25,8 @@ git checkout $branchName
 #Если вы выполняли задание со ⭐ в предыдущем ДЗ, вам нужно:
 #перенести файл lb.tf в terraform/files
 $lbtf = 'lb.tf'
-if (Test-Path -Path .\terraform\$lbtf){
-    Move-Item .\terraform\$lbtf -Destination .\terraform\files -Force
+if (Test-Path -Path $GitRootFolder\terraform\$lbtf){
+    Move-Item $GitRootFolder\terraform\$lbtf -Destination $GitRootFolder\terraform\files -Force
 }
 
 <#Используя наработки из предыдущего дз, создайте инфраструктуру при помощи тераформа
@@ -36,16 +37,47 @@ $TerraformRootFolder = "$GitRootFolder\terraform"
 
 $Location = (Get-Location).Path
 Set-Location $TerraformRootFolder
+
+#Создаем terraform.tfvars если его нет
+if (!(Test-Path -Path terraform.tfvars)){
+    Copy-Item -Path .\terraform.tfvars.example -Destination terraform.tfvars -Force
+}
+
 Get-ChildItem -Filter *.tf|foreach {terraform fmt $_.FullName}
+#terraform plan -destroy
+#terraform destroy -auto-approve=true
+terraform init
+#terraform refresh
+terraform plan
+#terraform taint google_compute_instance.app
+terraform apply -auto-approve=true
+#gcloud compute firewall-rules list --format=json
+#terraform import google_compute_firewall.firewall_ssh default-allow-ssh
+#terraform import google_compute_firewall.firewall_mongo allow-mongo-default
+
+
+
+#Правило файервола, открывающее SSH доступ ко всем инстансам, запущенным в сети default (которая тоже создается по умолчанию в новом проекте)
+gcloud compute firewall-rules list
+
+#Команда import позволяет добавить информацию о созданном без помощи Terraform ресурсе в state файл. В директории terraform выполните команду:
+terraform import google_compute_firewall.firewall_ssh default-allow-ssh
+
+#Free GCP
+terraform plan -destroy
+terraform destroy -auto-approve=true
 terraform plan
 terraform apply -auto-approve=true
-Set-Location $Location
 
-
-
+#gcloud compute instances list
+#gcloud compute zones list
+#gcloud compute instances delete reddit-app --zone europe-west1-b --quiet
+#gcloud compute firewall-rules delete allow-puma-default --quiet
 
 
 return
+
+Set-Location $Location
 
 $infra = "infra-244306"
 $sshKeysPath = "C:\\Users\\asmalyshev\\.ssh\\appuser.pub"
@@ -61,8 +93,7 @@ git checkout terraform-1
 
 
 
-#Проверить установку Terraform можно командой:
-terraform -v
+
 
 #Создать директорию terraform внутри проекта infra.
 $TerraformRootFolder = "terraform"
