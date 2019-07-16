@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-
+Environment=DATABASE_URL=${db_ip}
 WorkingDirectory=/home/appuser/reddit
 ExecStart=/usr/local/bin/pumactl start &>> /dev/null
 Restart=always

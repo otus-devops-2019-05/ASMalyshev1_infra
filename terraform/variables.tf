@@ -1,39 +1,38 @@
-variable project {
+# Terraform variables
+variable "project" {
+  type        = "string"
   description = "Project ID"
 }
 
-variable region {
-  description = "Region"
-
-  # Значение по умолчанию
-
-  default = "europe-west1"
+variable "region" {
+  type        = "string"
+  description = "region"
+  default     = "europe-west1"
 }
 
-variable public_key_path {
-  # Описание переменной
-
-  description = "Path to the public key used for ssh access"
+variable "zone" {
+  type        = "string"
+  description = "region zone"
+  default     = "europe-west1-b"
 }
 
-variable disk_image {
+variable "public_key_path" {
+  type        = "string"
+  description = "Path to thee public key used for ssh access"
+}
+
+variable "privat_key_path" {
+  type        = "string"
+  description = "Path to privat key used for provisioner connection"
+}
+
+variable "disk_image" {
+  type        = "string"
   description = "Disk image"
 }
 
-variable zone {
-  default = "europe-west1-b"
-}
-
-variable "private_key_path" {
-  description = " private key path"
-}
-
-variable app_disk_image {
-  description = "Disk image for reddit app"
-  default     = "reddit-app-base"
-}
-
-variable db_disk_image {
-  description = "Disk image for reddit db"
-  default     = "reddit-db-base"
+variable "instance_count" {
+  type        = "string"
+  description = "Count instances"
+  default     = "1"
 }
