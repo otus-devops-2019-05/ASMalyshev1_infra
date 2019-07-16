@@ -26,6 +26,3 @@ Invoke-WebRequest -Uri $TerraformDownloadUrl -Method Get -OutFile .\terraform.zi
     } ELSE {
     Write-Host "Error: DownLoad $TerraformDownloadUrl" -ForegroundColor Red
     }
-
-#Проверить установку Terraform можно командой:
-terraform -v

@@ -33,9 +33,7 @@ resource "google_compute_instance" "app" {
     network = "default"
 
     # использовать ephemeral IP для доступа из Интернет
-    access_config {
-      nat_ip = "${google_compute_address.app_ip.address}"
-    }
+    access_config {}
   }
 
   metadata {
@@ -80,23 +78,6 @@ resource "google_compute_firewall" "firewall_puma" {
 
   # Правило применения для инстансов с перечисленными тегами
   target_tags = ["reddit-app"]
-}
-
-resource "google_compute_firewall" "firewall_ssh" {
-  name        = "default-allow-ssh"
-  description = "Allow SSH from anywhere"
-  network     = "default"
-
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
-  }
-
-  source_ranges = ["0.0.0.0/0"]
-}
-
-resource "google_compute_address" "app_ip" {
-  name = "reddit-app-ip"
 }
 
 # use this resource to add single ssh key or single key/value metadata. If you manage different keys, or different metadata use resource declare after that
