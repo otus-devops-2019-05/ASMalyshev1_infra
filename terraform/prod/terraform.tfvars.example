@@ -8,5 +8,4 @@ zone = "europe-west1-b"
 
 disk_image = "reddit-base"
 
-public_key_path_appuser_web = "~/.ssh/appuser.pub"
-
+public_key_path_appuser_web = "~/.ssh/appuser_web.pub"
