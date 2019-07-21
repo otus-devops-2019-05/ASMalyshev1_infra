@@ -3,7 +3,7 @@
         {
             "type": "googlecompute",
             "project_id": "{{user `project_id`}}",
-            "image_name": "reddit-base-{{timestamp}}",
+            "image_name": "reddit-db-base",
             "image_family": "{{user `image_family`}}",
             "source_image_family": "ubuntu-1604-lts",
             "zone": "europe-west1-b",
@@ -20,11 +20,6 @@
     ],
 
     "provisioners": [
-        {
-            "type": "shell",
-            "script": "scripts/install_ruby.sh",
-            "execute_command": "sudo {{.Path}}"
-        },
         {
             "type": "shell",
             "script": "scripts/install_mongodb.sh",

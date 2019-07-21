@@ -1,8 +1,6 @@
 #!/bin/bash
-# Run this script with sudo
-echo "Install ruby"
-apt update && sudo apt install -y ruby-full ruby-bundler build-essential
-echo " "
-echo "Check versions of ruby and bundler"
-ruby -v
-bundler -v
+set -e
+
+# Install ruby
+apt update
+apt install -y ruby-full ruby-bundler build-essential
