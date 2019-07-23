@@ -3,8 +3,18 @@
 Clear-Host
 Set-Location $PSScriptRoot
 $Location = (Get-Location).Path
-
 $GitRootFolder = 'D:\GitHub\ASMalyshev1_infra'
+
+#Install WSL Ubuntu
+IF (!(Test-Path $GitRootFolder\PS\Ubuntu)){
+    #https://docs.microsoft.com/ru-ru/windows/wsl/install-win10
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+    Invoke-WebRequest -Uri https://aka.ms/wsl-ubuntu-1604 -OutFile Ubuntu.appx -UseBasicParsing
+    #curl.exe -L -o ubuntu-1604.appx https://aka.ms/wsl-ubuntu-1604
+    Rename-Item .\Ubuntu.appx .\Ubuntu.zip
+    Expand-Archive .\Ubuntu.zip .\Ubuntu
+    & .\Ubuntu\ubuntu1604.exe
+}
 
 # Создаем новую ветку в нашем инфраструктурном репозитории для выполнения данного ДЗ.
 $branchName = 'ansible-1'
@@ -27,6 +37,17 @@ git checkout $branchName
 IF (!(Test-Path "C:\Python*")){
 .\DownloadPython.ps1 -Version 2
 }
+# WSL
+<#
+sudo apt install python-minimal
+sudo apt install python-pip
+pip install --upgrade pip
+
+sudo apt update  
+sudo apt install --no-install-recommends python2.7-minimal python2.7 # this line is only necessary for Ubuntu 17.10 and later 
+sudo apt install python-numpy python-scipy
+apt-key update && apt-get update && apt-get -y upgrade && apt-get -y install python-software-properties && apt-get -y install software-properties-common && apt-add-repository -y ppa:rquillo/ansible && apt-get update && apt-get -y install ansible
+#>
 
 #Создать директорию ansible внутри проекта infra.
 $AnsibleRootFolder = "ansible"
@@ -41,12 +62,58 @@ Set-Location $GitRootFolder\$AnsibleRootFolder
 IF(!(Test-Path -Path .\requirements.txt)){
   Invoke-WebRequest -Uri https://gist.githubusercontent.com/Nklya/dd30419fe9d539c62d187bc5f4d87c83/raw/5938ce17d49b33b54836391428b4246347246f98/requirements.txt -Method Get -OutFile .\requirements.txt
 }
-#https://xakep.ru/2018/09/12/ansible-deploy/#toc00.1
+<#https://xakep.ru/2018/09/12/ansible-deploy/#toc00.1
 pip install -r requirements.txt
 pip install ansible>=2.4
 easy_install `cat requirements.txt`
 
 ansible --version
+#>
+# Создаем образы в GCP
+Set-Location $GitRootFolder\packer
+#packer build -var-file variables.json ubuntu16.json
+packer build -var-file variables.json app.json
+packer build -var-file variables.json db.json
+
+#Поднимите инфраструктуру, описанную в окружении stage
+Set-Location $GitRootFolder\terraform\stage
+<#
+terraform destroy -auto-approve=true
+#>
+terraform init
+terraform plan
+terraform apply -auto-approve=true
+
+$nat_ip_line = (Select-String -Path $GitRootFolder\terraform\stage\terraform.tfstate -Pattern '"nat_ip":').Line
+terraform show | Select-String -Pattern "nat_ip"
+$nat_ip = [regex]::Match($nat_ip_line,"(\d).+[0-9]").Value
+
+$inventory = 'inventory.'
+IF(!(Test-Path -Path $GitRootFolder\ansible\$inventory)){
+New-Item -Path $GitRootFolder\ansible\ -Name $inventory -ItemType File -Force
+}
+
+$inventory=@"
+terraform {
+  # Версия terraform
+  #required_version = "0.11.11" #OTUS
+  required_version = ">=0.11.11"
+  }
+  
+  provider "google" {
+  # Версия провайдера
+  # version = "2.0.0" #OTUS
+  version = "~> 2.5"
+
+  # ID проекта
+  project = "$infra" # Пишем свой индификатор группы в GCP
+  region = "europe-west-1"
+}
+"@.Split(13).Trim(10)
+$inventory|Out-File -FilePath .\$TerraformRootFolder\$inventory -Encoding utf8 -Force
+
+appserver ansible_host=35.195.186.154 ansible_user=appuser ansible_private_key_file=~/.ssh/appuser
+
 return
 
 

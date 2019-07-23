@@ -43,6 +43,8 @@ if (!(Test-Path -Path terraform.tfvars)){
     Copy-Item -Path .\terraform.tfvars.example -Destination terraform.tfvars -Force
 }
 
+#packer build -var-file variables.json template.json
+
 Get-ChildItem -Filter *.tf|foreach {terraform fmt $_.FullName}
 #terraform plan -destroy
 #terraform destroy -auto-approve=true
