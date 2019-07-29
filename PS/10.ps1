@@ -2,6 +2,8 @@
 
 Clear-Host
 Set-Location $PSScriptRoot
+#return
+
 $Location = (Get-Location).Path
 $GitRootFolder = 'D:\GitHub\ASMalyshev1_infra'
 
@@ -84,8 +86,7 @@ terraform init
 terraform plan
 terraform apply -auto-approve=true
 
-$nat_ip_line = (Select-String -Path $GitRootFolder\terraform\stage\terraform.tfstate -Pattern '"nat_ip":').Line
-terraform show | Select-String -Pattern "nat_ip"
+$nat_ip_line = (terraform show | Select-String -Pattern "app_external_ip") -replace "\[.*"
 $nat_ip = [regex]::Match($nat_ip_line,"(\d).+[0-9]").Value
 
 $inventory = 'inventory.'
@@ -93,26 +94,7 @@ IF(!(Test-Path -Path $GitRootFolder\ansible\$inventory)){
 New-Item -Path $GitRootFolder\ansible\ -Name $inventory -ItemType File -Force
 }
 
-$inventory=@"
-terraform {
-  # Версия terraform
-  #required_version = "0.11.11" #OTUS
-  required_version = ">=0.11.11"
-  }
-  
-  provider "google" {
-  # Версия провайдера
-  # version = "2.0.0" #OTUS
-  version = "~> 2.5"
-
-  # ID проекта
-  project = "$infra" # Пишем свой индификатор группы в GCP
-  region = "europe-west-1"
-}
-"@.Split(13).Trim(10)
-$inventory|Out-File -FilePath .\$TerraformRootFolder\$inventory -Encoding utf8 -Force
-
-appserver ansible_host=35.195.186.154 ansible_user=appuser ansible_private_key_file=~/.ssh/appuser
+"appserver ansible_host=$nat_ip ansible_user=appuser ansible_private_key_file=~/.ssh/appuser"|Out-File  $GitRootFolder\ansible\$inventory  -Force
 
 return
 
