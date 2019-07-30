@@ -3,8 +3,8 @@
     {
       "type": "googlecompute",
       "project_id": "{{user `project_id`}}",
-      "image_name": "reddit-app-base",
-      "image_family": "{{user `image_family`}}",
+      "image_name": "reddit-base-{{timestamp}}",
+      "image_family": "reddit-app-base",
       "source_image_family": "ubuntu-1604-lts",
       "image_description": "{{user `image_description`}}",
       "disk_type": "pd-ssd",
@@ -12,15 +12,14 @@
       "network": "default",
       "tags": "{{user `tags`}}",
       "zone": "europe-west1-b",
-      "ssh_username": "appuser",
+      "ssh_username": "root",
       "machine_type": "{{user `machine_type`}}"
     }
   ],
   "provisioners": [
     {
     "type": "ansible",
-    "playbook_file": "ansible/playbooks/packer_app.yml"
+    "playbook_file": "ansible/packer_app.yml"
     }
   ]
 }
-
