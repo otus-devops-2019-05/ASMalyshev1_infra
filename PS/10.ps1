@@ -1,26 +1,103 @@
-﻿# 9. Принципы организации инфраструктурного кода и работа над инфраструктурой в команде на примере Terraform.
-#https://ru.hexlet.io/blog/posts/terraform-bazovoe-ispolzovanie
+﻿# 10. Управление конфигурацией. Основные DevOps инструменты. Знакомство с Ansible
 
 Clear-Host
 Set-Location $PSScriptRoot
-$Location = (Get-Location).Path
+#return
 
+$Location = (Get-Location).Path
 $GitRootFolder = 'D:\GitHub\ASMalyshev1_infra'
 
-# Устанавливаем terraform если он не установлен
-IF (!(Test-Path "$env:windir\System32\terraform.exe")){
-#.\DownloadTerraform.ps1 -Version "0.11.11"
-.\DownloadTerraform.ps1
+#Install WSL Ubuntu
+IF (!(Test-Path $GitRootFolder\PS\Ubuntu)){
+    #https://docs.microsoft.com/ru-ru/windows/wsl/install-win10
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+    Invoke-WebRequest -Uri https://aka.ms/wsl-ubuntu-1604 -OutFile Ubuntu.appx -UseBasicParsing
+    #curl.exe -L -o ubuntu-1604.appx https://aka.ms/wsl-ubuntu-1604
+    Rename-Item .\Ubuntu.appx .\Ubuntu.zip
+    Expand-Archive .\Ubuntu.zip .\Ubuntu
+    & .\Ubuntu\ubuntu1604.exe
 }
 
-# Создаем новую ветку в нашем инфраструктурномрепозитории для выполнения данного ДЗ. Т.к. второе задание, посвященое работе с Terraform, то ветку назовем "terraform-2"
-$branchName = 'terraform-2'
+# Создаем новую ветку в нашем инфраструктурном репозитории для выполнения данного ДЗ.
+$branchName = 'ansible-1'
 
 # Создаем новую ветку "$branchName"
 git branch $branchName
 
-# Переходим в ветку "terraform-2"
+# Переходим в ветку "$branchName"
 git checkout $branchName
+
+<#
+План: 
+Установка Ansible
+Знакомство с базовыми функциями и инвентори
+Выполнение различных модулей на подготовленной в прошлых ДЗ инфраструктуре
+Пишем простой плейбук
+#>
+
+# Устанавливаем python если он не установлен
+IF (!(Test-Path "C:\Python*")){
+.\DownloadPython.ps1 -Version 2
+}
+# WSL
+<#
+sudo apt install python-minimal
+sudo apt install python-pip
+pip install --upgrade pip
+
+sudo apt update  
+sudo apt install --no-install-recommends python2.7-minimal python2.7 # this line is only necessary for Ubuntu 17.10 and later 
+sudo apt install python-numpy python-scipy
+apt-key update && apt-get update && apt-get -y upgrade && apt-get -y install python-software-properties && apt-get -y install software-properties-common && apt-add-repository -y ppa:rquillo/ansible && apt-get update && apt-get -y install ansible
+#>
+
+#Создать директорию ansible внутри проекта infra.
+$AnsibleRootFolder = "ansible"
+IF(!(Test-Path -Path $GitRootFolder\$AnsibleRootFolder)){
+  New-Item -Path $GitRootFolder -Name $AnsibleRootFolder -ItemType Directory -Force
+}
+
+# Переходим в созданную для проекта папку
+Set-Location $GitRootFolder\$AnsibleRootFolder
+
+#В корне репозитория $AnsibleRootFolder создать файл requirements.txt с содержимым указанным в https://gist.githubusercontent.com/Nklya/dd30419fe9d539c62d187bc5f4d87c83/raw/5938ce17d49b33b54836391428b4246347246f98/requirements.txt
+IF(!(Test-Path -Path .\requirements.txt)){
+  Invoke-WebRequest -Uri https://gist.githubusercontent.com/Nklya/dd30419fe9d539c62d187bc5f4d87c83/raw/5938ce17d49b33b54836391428b4246347246f98/requirements.txt -Method Get -OutFile .\requirements.txt
+}
+<#https://xakep.ru/2018/09/12/ansible-deploy/#toc00.1
+pip install -r requirements.txt
+pip install ansible>=2.4
+easy_install `cat requirements.txt`
+
+ansible --version
+#>
+# Создаем образы в GCP
+Set-Location $GitRootFolder\packer
+#packer build -var-file variables.json ubuntu16.json
+packer build -var-file variables.json app.json
+packer build -var-file variables.json db.json
+
+#Поднимите инфраструктуру, описанную в окружении stage
+Set-Location $GitRootFolder\terraform\stage
+<#
+terraform destroy -auto-approve=true
+#>
+terraform init
+terraform plan
+terraform apply -auto-approve=true
+
+$nat_ip_line = (terraform show | Select-String -Pattern "app_external_ip") -replace "\[.*"
+$nat_ip = [regex]::Match($nat_ip_line,"(\d).+[0-9]").Value
+
+$inventory = 'inventory.'
+IF(!(Test-Path -Path $GitRootFolder\ansible\$inventory)){
+New-Item -Path $GitRootFolder\ansible\ -Name $inventory -ItemType File -Force
+}
+
+"appserver ansible_host=$nat_ip ansible_user=appuser ansible_private_key_file=~/.ssh/appuser"|Out-File  $GitRootFolder\ansible\$inventory  -Force
+
+return
+
 
 #Если вы выполняли задание со ⭐ в предыдущем ДЗ, вам нужно:
 #перенести файл lb.tf в terraform/files
@@ -42,8 +119,6 @@ Set-Location $TerraformRootFolder
 if (!(Test-Path -Path terraform.tfvars)){
     Copy-Item -Path .\terraform.tfvars.example -Destination terraform.tfvars -Force
 }
-
-#packer build -var-file variables.json template.json
 
 Get-ChildItem -Filter *.tf|foreach {terraform fmt $_.FullName}
 #terraform plan -destroy
