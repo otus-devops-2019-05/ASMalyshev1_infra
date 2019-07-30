@@ -2,7 +2,7 @@
 
 Clear-Host
 Set-Location $PSScriptRoot
-#return
+return
 
 $Location = (Get-Location).Path
 $GitRootFolder = 'D:\GitHub\ASMalyshev1_infra'
