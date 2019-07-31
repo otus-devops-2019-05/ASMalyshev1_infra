@@ -1,5 +1,8 @@
 {
-    "project_id": "infra-244306",
-    "image_family": "imgfamily",
-    "machine_type": "f1-micro"
+  "project_id": "infra-id...",
+  "source_image_family": "ubuntu-1604-lts",
+  "image_description": "Ubuntu 16 lts image with installed Ruby and MongoDB",
+  "tags": "puma-server",
+  "disk_size" : "11"
 }
+
