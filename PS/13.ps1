@@ -1,4 +1,4 @@
-﻿# 12. Принципы организации кода для управления конфигурацией.
+﻿# 13. Локальная разработка Ansible ролей с Vagrant. Тестирование конфигурации.
 
 Clear-Host
 Set-Location $PSScriptRoot
@@ -8,7 +8,7 @@ $Location = (Get-Location).Path
 $GitRootFolder = 'D:\GitHub\ASMalyshev1_infra'
 
 # Создаем новую ветку в нашем инфраструктурном репозитории для выполнения данного ДЗ.
-$branchName = 'ansible-3'
+$branchName = 'ansible-4'
 
 # Создаем новую ветку "$branchName"
 git branch $branchName
