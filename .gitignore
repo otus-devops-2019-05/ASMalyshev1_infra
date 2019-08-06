@@ -1,6 +1,9 @@
+Ubuntu*
+*.retry
 *.tfstate
 *.tfstate.*.backup
 *.tfstate.backup
 *.tfvars
 .terraform/
-Ubuntu*
+jdauphant.nginx
+vault.key
